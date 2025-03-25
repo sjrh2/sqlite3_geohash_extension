@@ -156,9 +156,9 @@ namespace GeoHash {
 
 	private:
 		friend HashVector nearbyCells(double, double, double, GeoSphere const &);
-		friend HashVector nearbyCells(std::string_view) noexcept;
+		friend HashVector nearbyCells(std::string) noexcept;
 
-		std::string_view	data[9];
+		std::string	data[9];
 		size_t			size;
 
 		buffer_t		buffer[9];
@@ -166,7 +166,7 @@ namespace GeoHash {
 
 	// ------------------------------
 
-	std::string_view encode(double lat, double lon, size_t precision, buffer_t &buffer) noexcept;
+	std::string encode(double lat, double lon, size_t precision, buffer_t &buffer) noexcept;
 
 	inline auto encode(Point p, size_t precision, buffer_t &buffer){
 		return encode(p.lat, p.lon, precision, buffer);
@@ -180,12 +180,14 @@ namespace GeoHash {
 		};
 	}
 
-	Rectangle decode(std::string_view hash);
+	Rectangle decode(std::string hash);
 
-	std::string_view adjacent(std::string_view geohash, Direction direction, buffer_t &buffer) noexcept;
+	Point decode_centroid(std::string hash);
+
+	std::string adjacent(std::string geohash, Direction direction, buffer_t &buffer) noexcept;
 
 	[[deprecated]]
-	HashVector nearbyCells(std::string_view hash) noexcept;
+	HashVector nearbyCells(std::string hash) noexcept;
 
 	// ------------------------------
 

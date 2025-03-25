@@ -1,9 +1,10 @@
 
-CPP = gcc -std=c++17 -c
+CPP = g++ -std=c++17 -c -g 
 
-LINK = gcc -lstdc++ -lm -o
+LINK = g++ -lstdc++ -lm -o
 
-all: main
+all: main 
+	 ./main
 
 clean:
 	rm -fr *.o

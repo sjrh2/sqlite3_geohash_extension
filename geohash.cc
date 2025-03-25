@@ -2,7 +2,12 @@
 
 #include <cassert>
 #include <stdexcept>
-
+#include <string>
+#include <cmath>
+#include <cstdint>
+#include <array>
+#include <string_view>
+#include <utility>
 
 namespace GeoHash {
 	// based on https://www.movable-type.co.uk/scripts/geohash.html
@@ -12,11 +17,11 @@ namespace GeoHash {
 	constexpr double LON_MIN		= -180;
 	constexpr double LON_MAX		=  180;
 
-	constexpr inline static std::string_view BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"; // geohash-specific Base32 map
+	inline static std::string BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"; // geohash Base32 map
 
 	// ------------------------------
 
-	std::string_view encode(double lat, double lon, size_t precision, buffer_t &buffer) noexcept{
+	std::string encode(double lat, double lon, size_t precision, buffer_t &buffer) noexcept{
 		assert(precision > 0 && precision <= MAX_SIZE);
 
 		size_t  ixb = 0;	// index of the buffer
@@ -67,10 +72,10 @@ namespace GeoHash {
 
 		buffer[ixb] = '\0';
 
-		return std::string_view{ buffer.data(), ixb };
+		return std::string{ buffer.data(), ixb };
 	}
 
-	Rectangle decode(std::string_view hash){
+	Rectangle decode(std::string hash){
 		assert(hash.size() > 0 && hash.size() <= MAX_SIZE);
 
 		auto evenBit = true;
@@ -120,19 +125,26 @@ namespace GeoHash {
 		};
 	}
 
+	Point decode_centroid(std::string hash) {
+		Rectangle mbr = decode(hash);
+		double centerX = (mbr.sw.lon + mbr.ne.lon) / 2.0;
+		double centerY = (mbr.sw.lat + mbr.ne.lat) / 2.0;
+		return { centerX, centerY };
+	}
+
 	namespace{
 
-		std::string_view adjacent_calc_(size_t const size, Direction direction_, buffer_t &buffer){
+		std::string adjacent_calc_(size_t const size, Direction direction_, buffer_t &buffer){
 			// based on github.com/davetroy/geohash-js
 
-			constexpr static std::string_view neighbour[4][2] {
+			static std::string neighbour[4][2] {
 				{ "p0r21436x8zb9dcf5h7kjnmqesgutwvy", "bc01fg45238967deuvhjyznpkmstqrwx" },
 				{ "14365h7k9dcfesgujnmqp0r2twvyx8zb", "238967debc01fg45kmstqrwxuvhjyznp" },
 				{ "bc01fg45238967deuvhjyznpkmstqrwx", "p0r21436x8zb9dcf5h7kjnmqesgutwvy" },
 				{ "238967debc01fg45kmstqrwxuvhjyznp", "14365h7k9dcfesgujnmqp0r2twvyx8zb" }
 			};
 
-			constexpr static std::string_view border[4][2] {
+			static std::string border[4][2] {
 				{ "prxz",	"bcfguvyz"	},
 				{ "028b",	"0145hjnp"	},
 				{ "bcfguvyz",	"prxz"		},
@@ -144,7 +156,7 @@ namespace GeoHash {
 			auto const type      = size % 2;
 
 			// check for edge-cases which don't share common prefix
-			if (border[direction][type].find(lastCh) != std::string_view::npos && size - 1 > 0)
+			if (border[direction][type].find(lastCh) != std::string::npos && size - 1 > 0)
 				adjacent_calc_(size - 1, direction_, buffer);
 
 			// append letter for direction to parent
@@ -155,7 +167,7 @@ namespace GeoHash {
 
 	} // anonymous namespace
 
-	std::string_view adjacent(std::string_view geohash, Direction direction, buffer_t &buffer) noexcept{
+	std::string adjacent(std::string geohash, Direction direction, buffer_t &buffer) noexcept{
 		assert(geohash.size() > 0 && geohash.size() <= MAX_SIZE);
 
 		// copy into buffer
@@ -366,7 +378,7 @@ namespace GeoHash {
 	}
 
 	[[deprecated]]
-	HashVector nearbyCells(std::string_view hash) noexcept{
+	HashVector nearbyCells(std::string hash) noexcept{
 		HashVector v;
 
 		v.size = 8;
