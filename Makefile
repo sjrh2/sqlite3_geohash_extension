@@ -1,2 +1,2 @@
 all:
-	cc -o geohash main.c geohash.c
+	cc -o geohash main.c geohash.c -lm
