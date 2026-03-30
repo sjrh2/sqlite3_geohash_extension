@@ -176,7 +176,7 @@ static void geohash_encode_api(sqlite3_context *context, int argc, sqlite3_value
 	char geohash[64] = {0};
 	if (geohash_encode(lat, lon, geohash, sizeof(geohash)) != GEOHASH_OK)
 			printf("encode error\n");
-		else
+	else
 			sqlite3_result_text(context, geohash, -1, SQLITE_TRANSIENT);
 }
 
@@ -190,7 +190,7 @@ static void geohash_decode_api(sqlite3_context *context, int argc, sqlite3_value
 	char lat_lon[64];
 	if (geohash_decode((char *)geoH_in, &lat, &lon) != GEOHASH_OK)
 			printf("decode error\n");
-		else
+	else
 			sprintf(lat_lon, "lat: %.14f, lon: %.14f\n", lat, lon);
 			sqlite3_result_text(context, lat_lon, -1, SQLITE_TRANSIENT);
 			

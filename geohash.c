@@ -4,6 +4,7 @@
 #include <float.h>
 #include <string.h>
 
+
 #include "geohash.h"
 
 /* BASE 32 encode table */
